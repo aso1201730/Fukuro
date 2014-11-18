@@ -1,13 +1,17 @@
 package com.android.fukuro;
 
+import java.util.ArrayList;
+
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
 	private final static String DB_NAME = "fukuro.db";
 	private final static int DB_VERSION = 1;
-	
+
 	public DBHelper(Context context){
 		super(context, DB_NAME, null, DB_VERSION);
 	}
@@ -15,7 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// データベース作成時の処理を記述する。
-		
+
 		// テーブル作成
 		// ユーザテーブル
 		String sql1 = "CREATE TABLE User ( " +
@@ -59,7 +63,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				"good NUMERIC NOT NULL, " +
 				"PRIMARY KEY(ranking_id), " +
 				"FOREIGN KEY(user_id)REFERENCES User(user_id))";
-		
+
 		//SQL文の実行
 		db.execSQL(sql1);
 		db.execSQL(sql2);
@@ -67,7 +71,7 @@ public class DBHelper extends SQLiteOpenHelper {
 		db.execSQL(sql4);
 		db.execSQL(sql5);
 		db.execSQL(sql6);
-		
+
 		//データ挿入
 		// ユーザテーブ
 		db.execSQL("INSERT INTO User(user_id,user_name) VALUES('0000001','相沢')");
@@ -86,5 +90,79 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+
 	}
+
+	public void Fuku(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+
+
+
+	}
+
+	public String InsertMylist(SQLiteDatabase db , String date){
+			String MylistID = null;
+			String time = date;
+		 		ArrayList<String> ItemList = new ArrayList<String>();
+
+
+		 		String sql2 = "select mylist_id from Mylist order by mylist_id";
+
+
+		 		Cursor c2 = db.rawQuery(sql2, null);
+
+
+		 		c2.moveToFirst();
+
+
+		 		for(int i = 0; i < c2.getCount(); i++){
+		 			ItemList.add(c2.getString(0));
+		 			c2.moveToNext();
+		 		}
+
+
+		 		int j = 0;
+				String ID = null;
+
+
+		 		for(j = 0; j < ItemList.size(); j++){
+
+
+		 			if(!(ItemList.get(j).equals(String.format("%02d",j + 1)))){
+		 				Log.d("check1",String.format("%02d", j + 1));
+		 				Log.d("check2",ItemList.get(j));
+
+
+		 				break;
+		 			}
+		 		}
+
+
+		 		ID = String.format("%02d", j + 1);
+
+
+		 		ItemList = new ArrayList<String>();
+
+
+		 		String sql = "INSERT INTO Mylist(mylist_id,thambnail, maked, favorite) VALUES(\""+ ID +"\",\"" + ID + ".png\",\"" + time + "\",\"false\")";
+		 		db.execSQL(sql);
+		 		return MylistID;
+		 	}
+
+	public void InsertMylistmaking(SQLiteDatabase db, String MylistID, String ItemID, Integer a, Integer b, Integer c, Integer d){
+		String mylistid = MylistID;
+		Integer itemid =  Integer.parseInt(ItemID);
+		Integer right = c;
+		Integer top = b;
+		Integer bottom = d;
+		Integer left = a;
+
+		String sql ="INSERT INTO Mylistmaking(mylist_id,item_id,item_position_R,item_priority,item_position_T,item_position_B,item_position_L,magni)"
+				+ " VALUES(\""+ mylistid +"\",\""+ ItemID + "\",\""+ right + "\",\""+ itemid + "\",\""+ top + "\",\""+ bottom + "\",\""+ left + "\",\"1\")";
+		db.execSQL(sql);
+	}
+
+
+
 }
